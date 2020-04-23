@@ -54,16 +54,19 @@ u32 find_var_sortante(contrainte_t* tab_contraintes,
                       u32* indice_var_entrente)
 {
     //plus petit rapport positif......
-    double rapport_min = tab_contraintes[0].coefficients[simplexe_info.nb_var + simplexe_info.nb_de_contrainte_inf_egale] / tab_contraintes[0].coefficients[*indice_var_entrente];
+    double rapport_min = 100000;
     u32 indice_rapport_min = 0;
-    for(int i = 1 ; i < simplexe_info.nb_de_contrainte_inf_egale ; i++)
+    for(int i = 0 ; i < simplexe_info.nb_de_contrainte_inf_egale ; i++)
     {
-        if( (tab_contraintes[i].coefficients[simplexe_info.nb_de_contrainte_inf_egale + simplexe_info.nb_var] / tab_contraintes[i].coefficients[*indice_var_entrente] < rapport_min) && (tab_contraintes[i].coefficients[simplexe_info.nb_de_contrainte_inf_egale + simplexe_info.nb_var] / tab_contraintes[i].coefficients[*indice_var_entrente]) > 0 )
+        printf("%lf\n",tab_contraintes[i].coefficients[simplexe_info.nb_de_contrainte_inf_egale + simplexe_info.nb_var]);
+        //printf("%lf\n",tab_contraintes[i].coefficients[*indice_var_entrente]);
+        if( (tab_contraintes[i].coefficients[simplexe_info.nb_de_contrainte_inf_egale + simplexe_info.nb_var] / tab_contraintes[i].coefficients[*indice_var_entrente] < rapport_min) && (tab_contraintes[i].coefficients[*indice_var_entrente] > 0) )
         {
             indice_rapport_min = i;
             rapport_min = tab_contraintes[i].coefficients[simplexe_info.nb_de_contrainte_inf_egale + simplexe_info.nb_var] / tab_contraintes[i].coefficients[*indice_var_entrente];
         }
     }
+    *indice_var_sortante = indice_rapport_min;
     return 1;
 }
 
@@ -107,6 +110,7 @@ u32 pivot(contrainte_t* contrainte,
     for(int i = 0 ; i < simplexe_info.nb_var + simplexe_info.nb_de_contrainte_inf_egale + 1; i++)
     {
         contrainte->coefficients[i] -= coef * pivot.coefficients[i];
+
     }
     return 1;
 }
@@ -133,6 +137,8 @@ u32 maj_tab_simplexe(contrainte_t* tab_contraintes,
 {
     for(int i = 0; i < simplex_info.nb_de_contrainte_inf_egale ; i++)
     {
+
+
         if(i == indice_var_sortante)
             continue;
         else
@@ -141,6 +147,7 @@ u32 maj_tab_simplexe(contrainte_t* tab_contraintes,
                     indice_var_entrante,
                     tab_contraintes[indice_var_sortante],
                     simplex_info);
+
         }
     }
     pivot_last_line(last_line,
@@ -171,12 +178,11 @@ u32 write_solution(contrainte_t* tab_contraintes,
 {
     for(int i = 0 ; i < simplexe_info.nb_de_contrainte_inf_egale ; i++)
     {
-        if(tab_contraintes[i].var_in_base < simplexe_info.nb_var )
-        {
             fprintf(fptr_output, "x%d = %lf\n",i,tab_contraintes[i].coefficients[simplexe_info.nb_var + simplexe_info.nb_de_contrainte_inf_egale]);
-        }
+
     }
     fprintf(fptr_output, "valeur optimale = %lf\n", last_line.coefficients[simplexe_info.nb_de_contrainte_inf_egale + simplexe_info.nb_var]);
+    fprintf(fptr_output, "last line %lf %lf %lf %lf\n",last_line.coefficients[0],last_line.coefficients[1],last_line.coefficients[2],last_line.coefficients[3]);
     return 1;
 }
 
@@ -202,7 +208,7 @@ int main(int argc, char* argv[])
 
     int nb_var = atoi(str_nb_var);
     int nb_contraintes = atoi(str_nb_contraintes);
-    printf("%d contraintes\n",nb_contraintes);
+
     free(str_nb_contraintes);
     free(str_nb_var);
 
@@ -220,6 +226,7 @@ int main(int argc, char* argv[])
                       last_line,
                       simplexe_info,
                       fptr_input);
+    //printf("%lf %lf %lf\n",tab_contrainte[0].coefficients[5],tab_contrainte[1].coefficients[5],tab_contrainte[2].coefficients[5]);
 
     test_fin_algo(*last_line,
                   simplexe_info);
@@ -231,18 +238,22 @@ int main(int argc, char* argv[])
     while(booleen)
     {
         //seg fault ici
-        find_var_sortante(tab_contrainte,
-                        *simplexe_info,
-                        &indice_sortant,
-                        &indice_entrant);
 
         find_var_entrante(last_line,
                           *simplexe_info,
                           &indice_entrant);
 
+        find_var_sortante(tab_contrainte,
+                        *simplexe_info,
+                        &indice_sortant,
+                        &indice_entrant);
+
+
+        printf("entrant %d %d\n",indice_entrant, indice_sortant);
         normalise_pivot(&tab_contrainte[indice_sortant],
                         indice_entrant,
                         *simplexe_info);
+        printf("%lf %lf %lf\n",tab_contrainte[0].coefficients[5],tab_contrainte[1].coefficients[5],tab_contrainte[2].coefficients[5]);
 
         maj_tab_simplexe(tab_contrainte,
                          last_line,
@@ -250,9 +261,11 @@ int main(int argc, char* argv[])
                          indice_sortant,
                          indice_entrant,
                          *simplexe_info);
+        //printf("%lf %lf %lf\n",tab_contrainte[0].coefficients[5],tab_contrainte[1].coefficients[5],tab_contrainte[2].coefficients[5]);
 
         booleen = test_fin_algo(*last_line,
                                 simplexe_info);
+        //printf("%lf %lf %lf\n",tab_contrainte[0].coefficients[5],tab_contrainte[1].coefficients[5],tab_contrainte[2].coefficients[5]);
 
     }
     write_solution(tab_contrainte,
