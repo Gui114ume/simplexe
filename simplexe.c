@@ -54,11 +54,11 @@ u32 find_var_sortante(contrainte_t* tab_contraintes,
                       u32* indice_var_entrente)
 {
     //plus petit rapport positif......
-    double rapport_min = 100000;
+    double rapport_min = tab_contraintes[0].coefficients[simplexe_info.nb_de_contrainte_inf_egale + simplexe_info.nb_var] / tab_contraintes[0].coefficients[*indice_var_entrente];
     u32 indice_rapport_min = 0;
-    for(int i = 0 ; i < simplexe_info.nb_de_contrainte_inf_egale ; i++)
+    for(int i = 1 ; i < simplexe_info.nb_de_contrainte_inf_egale ; i++)
     {
-        printf("%lf\n",tab_contraintes[i].coefficients[simplexe_info.nb_de_contrainte_inf_egale + simplexe_info.nb_var]);
+        //printf("%lf\n",tab_contraintes[i].coefficients[simplexe_info.nb_de_contrainte_inf_egale + simplexe_info.nb_var]);
         //printf("%lf\n",tab_contraintes[i].coefficients[*indice_var_entrente]);
         if( (tab_contraintes[i].coefficients[simplexe_info.nb_de_contrainte_inf_egale + simplexe_info.nb_var] / tab_contraintes[i].coefficients[*indice_var_entrente] < rapport_min) && (tab_contraintes[i].coefficients[*indice_var_entrente] > 0) )
         {
@@ -182,7 +182,7 @@ u32 write_solution(contrainte_t* tab_contraintes,
 
     }
     fprintf(fptr_output, "valeur optimale = %lf\n", last_line.coefficients[simplexe_info.nb_de_contrainte_inf_egale + simplexe_info.nb_var]);
-    fprintf(fptr_output, "last line %lf %lf %lf %lf\n",last_line.coefficients[0],last_line.coefficients[1],last_line.coefficients[2],last_line.coefficients[3]);
+    //fprintf(fptr_output, "last line %lf %lf %lf %lf\n",last_line.coefficients[0],last_line.coefficients[1],last_line.coefficients[2],last_line.coefficients[3]);
     return 1;
 }
 
@@ -249,11 +249,11 @@ int main(int argc, char* argv[])
                         &indice_entrant);
 
 
-        printf("entrant %d %d\n",indice_entrant, indice_sortant);
+        //printf("entrant %d %d\n",indice_entrant, indice_sortant);
         normalise_pivot(&tab_contrainte[indice_sortant],
                         indice_entrant,
                         *simplexe_info);
-        printf("%lf %lf %lf\n",tab_contrainte[0].coefficients[5],tab_contrainte[1].coefficients[5],tab_contrainte[2].coefficients[5]);
+        //printf("%lf %lf %lf\n",tab_contrainte[0].coefficients[5],tab_contrainte[1].coefficients[5],tab_contrainte[2].coefficients[5]);
 
         maj_tab_simplexe(tab_contrainte,
                          last_line,
