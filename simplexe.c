@@ -5,7 +5,15 @@
 #include "simplexe.h"
 
 /*
+ * Implémentation de l'algorithme du simplexe, trouve le maximum d'une fonction objective sous contraintes <=.
  * On considere que le fichier d'entree ne comprends que des contraintes en <= !
+ * On considere que 0 est une solution de base admissible
+ *
+ * Il faut implémenter la méthode du grand M si ce n'est pas le cas, puis continuer avec le simplexe déjà implémenté
+ *
+ * Les cas ou il y a toujours une meilleure solution ne sont pas détectés, le programme tournera indéfiniment à priori
+ *
+ * J'ai lu que si des contraintes sont redondante, il peut y avoir des problèmes de cyclage : non traité par cette implémentation
  */
 
 u32 init_tab_simplexe(contrainte_t* tab_contraintes,
@@ -58,8 +66,7 @@ u32 find_var_sortante(contrainte_t* tab_contraintes,
     u32 indice_rapport_min = 0;
     for(int i = 1 ; i < simplexe_info.nb_de_contrainte_inf_egale ; i++)
     {
-        //printf("%lf\n",tab_contraintes[i].coefficients[simplexe_info.nb_de_contrainte_inf_egale + simplexe_info.nb_var]);
-        //printf("%lf\n",tab_contraintes[i].coefficients[*indice_var_entrente]);
+
         if( (tab_contraintes[i].coefficients[simplexe_info.nb_de_contrainte_inf_egale + simplexe_info.nb_var] / tab_contraintes[i].coefficients[*indice_var_entrente] < rapport_min) && (tab_contraintes[i].coefficients[*indice_var_entrente] > 0) )
         {
             indice_rapport_min = i;
@@ -182,7 +189,7 @@ u32 write_solution(contrainte_t* tab_contraintes,
 
     }
     fprintf(fptr_output, "valeur optimale = %lf\n", last_line.coefficients[simplexe_info.nb_de_contrainte_inf_egale + simplexe_info.nb_var]);
-    //fprintf(fptr_output, "last line %lf %lf %lf %lf\n",last_line.coefficients[0],last_line.coefficients[1],last_line.coefficients[2],last_line.coefficients[3]);
+
     return 1;
 }
 
@@ -226,7 +233,7 @@ int main(int argc, char* argv[])
                       last_line,
                       simplexe_info,
                       fptr_input);
-    //printf("%lf %lf %lf\n",tab_contrainte[0].coefficients[5],tab_contrainte[1].coefficients[5],tab_contrainte[2].coefficients[5]);
+
 
     test_fin_algo(*last_line,
                   simplexe_info);
@@ -237,7 +244,7 @@ int main(int argc, char* argv[])
 
     while(booleen)
     {
-        //seg fault ici
+
 
         find_var_entrante(last_line,
                           *simplexe_info,
@@ -248,12 +255,9 @@ int main(int argc, char* argv[])
                         &indice_sortant,
                         &indice_entrant);
 
-
-        //printf("entrant %d %d\n",indice_entrant, indice_sortant);
         normalise_pivot(&tab_contrainte[indice_sortant],
                         indice_entrant,
                         *simplexe_info);
-        //printf("%lf %lf %lf\n",tab_contrainte[0].coefficients[5],tab_contrainte[1].coefficients[5],tab_contrainte[2].coefficients[5]);
 
         maj_tab_simplexe(tab_contrainte,
                          last_line,
@@ -261,11 +265,9 @@ int main(int argc, char* argv[])
                          indice_sortant,
                          indice_entrant,
                          *simplexe_info);
-        //printf("%lf %lf %lf\n",tab_contrainte[0].coefficients[5],tab_contrainte[1].coefficients[5],tab_contrainte[2].coefficients[5]);
 
         booleen = test_fin_algo(*last_line,
                                 simplexe_info);
-        //printf("%lf %lf %lf\n",tab_contrainte[0].coefficients[5],tab_contrainte[1].coefficients[5],tab_contrainte[2].coefficients[5]);
 
     }
     write_solution(tab_contrainte,
