@@ -1,6 +1,11 @@
 #ifndef SIMPLEXE_H
 #define SIMPLEXE_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 

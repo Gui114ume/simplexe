@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-g -Wall -O0
+CFLAGS=-O3
 LDFLAGS=
 
 all:	simplexe
